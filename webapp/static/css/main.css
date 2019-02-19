@@ -1,149 +1,135 @@
 body {
+    font-family: Lora;
     /* Background pattern from subtlepatterns.com */
-    background: url("/~milewsp1/static/img/main.png") repeat;
-    font-family: Arial;
-    color: white;
-    margin: 0;
+    background: url("../img/main.png") repeat;
+    background-attachment: fixed;
+    background-position: center;
 }
 
-.main_elem {
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 60px;
-    text-align: center;
-    width: 580px;
-    border: gold 2px;
-    border-style: solid;
-    border-radius: 5px;
-    padding: 10px 10px 20px 10px;
-    background-color: #333;
-}
-.file_list_container {
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 60px;
-    text-align: center;
-    width: 580px;
-    border: gold 2px;
-    border-style: solid;
-    border-radius: 5px;
-    padding: 10px 10px 20px 10px;
-    background-color: #333;
-    height: 170px;
-}
-.communication_container {
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 60px;
-    text-align: center;
-    width: 580px;
-    border: gold 2px;
-    border-style: solid;
-    border-radius: 5px;
-    padding: 10px 10px 20px 10px;
-    background-color: #333;
-    height: 50px;
-}
-h1 {
-    color: white;
-    text-align: center;
+h1, h2, h3, h4, h5, h6 {
+    font-family: Raleway
 }
 
 p {
-    font-family: verdana;
-    font-size: 20px;
+    line-height: 1.75
 }
 
-.menu {
-    list-style: none;
-    color: gold;
+input.link_container {
+    width: 100%;
 }
 
-a:hover {
-    color: gold;
-
+.header {
+    background-color: rgba(33, 33, 33, .9);
 }
 
-a:visited {
-    color: gold;
+.text-faded {
+    color: rgba(255, 255, 255, .3)
 }
+
+.section-heading {
+    text-transform: uppercase
+}
+
+.section-heading .section-heading-upper {
+    display: block;
+    font-size: 1rem;
+    font-weight: 800
+}
+
+.section-heading .section-heading-lower {
+    display: block;
+    font-size: 3rem;
+    font-weight: 100
+}
+
+.message {
+    color: firebrick;
+}
+
+.bg-faded {
+    background-color: rgba(255, 255, 255, .7)
+}
+
+
+#mainNav {
+    background-color: rgba(33, 33, 33, .9);
+    font-family: Raleway;
+    margin-top: -10px;
+}
+
+#mainNav .navbar-brand {
+    color: #e6a756
+}
+
+#mainNav .navbar-nav .nav-item .nav-link {
+    color: rgba(255, 255, 255, .7);
+    font-weight: 800
+}
+
+#mainNav .navbar-nav .nav-item.active .nav-link {
+    color: #e6a756
+}
+
+
+.btn-xl {
+    font-weight: 700;
+    font-size: .8rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    padding-left: 2rem;
+    padding-right: 2rem
+}
+
+.intro {
+    position: relative
+}
+
+@media (min-width: 992px) {
+    .intro .intro-img {
+        width: 75%;
+        float: right
+    }
+
+    .intro .intro-text {
+        left: 0;
+        width: 60%;
+        margin-top: 3rem;
+        position: absolute
+    }
+
+    .intro .intro-text .intro-button {
+        width: 100%;
+        left: 0;
+        position: absolute;
+        bottom: -2rem
+    }
+}
+
+@media (min-width: 1200px) {
+    .intro .intro-text {
+        width: 45%
+    }
+}
+
+.cta {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.form_button {
+    width: 50%;
+    margin-top: 1rem;
+    position: absolute;
+}
+
+.form_button_big {
+    width: 100%;
+    margin-top: 1rem;
+}
+
 
 .footer {
+    background-color: rgba(33, 33, 33, .9);
+    margin-top: 10rem;
     width: 100%;
-    text-align: center;
-    position: fixed;
-    bottom: 0px;
-}
-
-.form_elem {
-    margin-left: auto;
-    margin-right: auto;
-    width: 520px;
-    height: 60px;
-}
-
-.form_elem_button {
-    margin-left: auto;
-    margin-right: auto;
-    width: 520px;
-    height: 40px;
-}
-
-.left {
-    width: 260px;
-    float: left;
-    text-align: left;
-}
-
-.right {
-    width: 260px;
-    float: right;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.clear {
-    clear: both;
-}
-
-.data_field {
-    width: 250px;
-    height: 17px;
-}
-
-.data_field_photo {
-    width: 250px;
-    height: 30px;
-}
-
-.validation {
-    color: red;
-    text-align: left;
-    font-size: 80%;
-}
-
-.validation_server {
-    color: red;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    text-align: center;
-    font-size: 80%;
-}
-
-.validation_server_ok {
-    color: green;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    text-align: center;
-    font-size: 80%;
-}
-
-#login_button {
-    margin-top: 10px;
-    width: 100%;
-    height: 80%;
-}
-
-#share_link {
-    width: 90%;
 }

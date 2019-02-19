@@ -1,79 +1,82 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <title>{{ login }} Dashboard</title>
-    <meta charset="UTF-8"/>
-    <meta http-equiv="refresh" content="230"/>
-    <link rel="Stylesheet" type="text/css" href="https://edi.iem.pw.edu.pl/~milewsp1/static/css/main.css">
-    <link rel="Stylesheet" type="text/css" href="https://edi.iem.pw.edu.pl/~milewsp1/static/css/menu.css">
-</head>
-<body>
-<aside>
-    <div class="logout">
-        <ul id="menu">
-            <li class="menu_li_user">{{ parameters['login'] }}</li>
-            <li class="menu_li"><a href={{ parameters['logout_endpoint'] }}>Wyloguj</a></li>
-        </ul>
-    </div>
-</aside>
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <article class="communication_container">
-            <div class="form_elem" id="communicate">
-                {% if not messages[1] %}
-                    <div id="login_validation" class="validation_server">Ups... Coś poszło nie tak</div>
-                {% elif not messages[2] %}
-                    <div id="login_validation" class="validation_server{{ messages[1] }}"></div>
-                {% endif %}
-                <div id="login_validation" class="validation_server{{ messages[1] }}">{{ messages[0] }}</div>
-                {% if messages[2] %}
-                    <form>
-                        <input type="text" value="{{ messages[2] }}" id="share_link" readonly>
-                    </form>
-                {% endif %}
-            </div>
-        </article>
-    {% endif %}
-{% endwith %}
-{% if parameters['length'] != 0 %}
-    <article class="file_list_container">
-        <h2>Twoje pliki:</h2>
-        <div class="form_elem" id="{{ parameters['file_name'] }}">
-            {% for i in range(parameters['length']) %}
-                <div class="left">{{ parameters['files'][i] }}</div>
-                {% if parameters['show_links'][i] != '' %}
-                    <div class="right"><a href="{{ parameters['download_links'][i] }}">Download</a> <a
-                            href="{{ parameters['share_links'][i] }}">Unshare</a>
-                        <a href="{{ parameters['show_links'][i] }}">Show link</a></div>
-                {% else %}
-                    <div class="right"><a href="{{ parameters['download_links'][i] }}">Download</a> <a
-                            href="{{ parameters['share_links'][i] }}">Share</a>
-                    </div>
-                {% endif %}
-                <div class="clear"></div>
-            {% endfor %}
-        </div>
-    </article>
-{% endif %}
-{% if parameters['disable_upload'] == 0 %}
-    <article class="main_elem">
-        <h2>Dodaj plik:</h2>
-        <form id="uploadForm" method="POST" action="https://edi.iem.pw.edu.pl/milewsp1/app/upload"
-              enctype="multipart/form-data">
-            <div class="form_elem" id="login">
-                <input type="file" name="file">
-                <input type="hidden" name="authorization" value="{{ parameters['token'] }}">
-            </div>
-            <div class="form_elem_button">
-                <input type="submit" name="send" value="Wyślij" id="login_button">
-            </div>
-        </form>
-    </article>
-{% endif %}
+{% extends "layout.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+    <section class="page-section cta">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-9 mx-auto">
 
-<footer class="footer">
-    Patryk Milewski &#xA9; 2018
-</footer>
-<script type="text/javascript" src="https://edi.iem.pw.edu.pl/~milewsp1/static/js/longpolling.js"></script>
-</body>
-</html>
+                    <div class="bg-faded rounded p-5">
+                        {% if parameters['length'] != 0 %}
+                            <h2 class="section-heading d-none d-sm-none d-md-block">
+                                <span class="section-heading-upper">{{ user_parameters['login'] }}</span>
+                                <span class="section-heading-lower">Twoje pliki</span>
+                            </h2>
+                            <h2 class="section-heading d-block d-sm-block d-md-none">
+                                <span class="section-heading-upper">Twoje pliki</span>
+                            </h2>
+                            <div class="table-responsive">
+                            <table class="table d-none d-sm-none d-md-block d-lg-block mx-auto">
+                                <thead>
+                                <tr>
+                                    <th scope="col" class="col-sm-4">Plik</th>
+                                    <th scope="col" class="col-sm-4">Pobierz</th>
+                                    <th scope="col" class="col-sm-4">Udostępnij</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for i in range(parameters['length']) %}
+                                    <tr>
+                                        <td>{{ parameters['files'][i] }}</td>
+                                        <td><a href="{{ parameters['download_links'][i] }}">Download</a></td>
+                                        <td>
+                                            {% if parameters['show_links'][i] != '' %}
+                                                <a href="{{ parameters['share_links'][i] }}">Unshare</a>|
+                                                <a href="{{ parameters['show_links'][i] }}">Link</a>
+                                            {% else %}
+                                                <a href="{{ parameters['share_links'][i] }}">Share</a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            </div>
+                            <ul class="list-unstyled list-hours mb-5 text-left mx-auto d-block d-sm-block d-md-none">
+                                <li class="list-unstyled-item list-hours-item d-flex">
+                                    Plik
+                                    <span class="ml-auto">Udostępnij</span>
+                                </li>
+                                <hr>
+                                {% for i in range(parameters['length']) %}
+                                    <li class="list-unstyled-item list-hours-item d-flex">
+                                        <a href="{{ parameters['download_links'][i] }}">{{ parameters['files'][i] }}</a>
+                                        <span class="ml-auto">
+                                        {% if parameters['show_links'][i] != '' %}
+                                            <a href="{{ parameters['share_links'][i] }}">Unshare</a>|
+                                            <a href="{{ parameters['show_links'][i] }}">Link</a>
+                                        {% else %}
+                                            <a href="{{ parameters['share_links'][i] }}">Share</a>
+                                        {% endif %}
+                                        </span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            Tu pojawią się Twoje pliki
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+    <script type="text/javascript" src="{{ parameters['long_polling_js'] }}"></script>
+{% endblock %}
+
+
+
+
+
+
+

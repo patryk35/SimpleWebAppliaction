@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}Upload{% endblock %}
+{% block content %}
+    <section class="page-section cta">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-9 mx-auto">
+                    <div class="bg-faded rounded p-3">
+                        <h2 class="section-heading d-none d-sm-none d-md-block">
+                            <span class="section-heading-lower">Dodaj plik</span>
+                        </h2>
+                        <h2 class="section-heading d-block d-sm-block d-md-none">
+                            <span class="section-heading-upper">Dodaj plik</span>
+                        </h2>
+                        <form method="POST" action="{{ parameters['upload_endpoint'] }}" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <input type="hidden" name="authorization" value="{{ parameters['token'] }}">
+                                <input type="file" class="form-control-file" name="file">
+                                <input type="submit" class="btn btn-primary form_button_big d-none d-sm-none d-md-block"
+                                       name="send" value="Wyślij">
+                                <input type="submit" class="btn btn-primary form_button d-block d-sm-block d-md-none"
+                                       name="send" value="Wyślij">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

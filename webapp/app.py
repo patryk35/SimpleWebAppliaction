@@ -7,7 +7,8 @@ from flask import Flask, render_template, redirect, url_for, flash, Response, js
 from flask import session
 from flask import request
 from functools import wraps, lru_cache
-from config.configuration import ENDPOINTS_RELATIVE_ADDRESSES, ENDPOINTS_FULL_ADDRESSES, SSL_CERTIFICATE_VERIFY
+from config.configuration import ENDPOINTS_RELATIVE_ADDRESSES, ENDPOINTS_FULL_ADDRESSES, SSL_CERTIFICATE_VERIFY, \
+    LAYOUT_PARAMETERS, LONG_POLLING_JS_FILE
 from config.naming import FILE_ENDPOINTS_ADDRESSES
 from dashboard.tools import prepare_download_links, encode_auth_token, prepare_share_links
 from dashboard.UploadedFile import UploadedFile
@@ -18,11 +19,13 @@ from authlib.flask.client import OAuth
 from six.moves.urllib.parse import urlencode
 from werkzeug.exceptions import HTTPException
 
+
+# TODO(High): Czyszczenie css, poprawa struktury na serwerze, dodanie samodzielnych scss, doadnie tego do main folderu
+# TODO(High): Sprawko: 3x screeny x3 + performance tests - usunac czcionki???
 # TODO(Medium): Review endpoints and check if it is correct with REST or rewrite it flask restful
 # TODO(Medium): Create repo for project
 # TODO(Low): Create function create_link to add "/" for link elems when it is necessary and then remove ".../"
 #  from naming and dl config
-# TODO(Low): Parametrize urls in templates and static files
 # TODO(Low): Do cleaning in messages - flash. The best way is creating function to operate on flash
 # TODO(Minor): Funny error site
 # TODO(Minor): Deployment script
@@ -62,6 +65,8 @@ def handle_auth_error(ex):
     return response
 
 
+'''Authorization section'''
+
 oauth = OAuth(app)
 
 auth0 = oauth.register(
@@ -81,7 +86,7 @@ def authentication_required(func):
     @wraps(func)
     def decorated(*args, **kwargs):
         if constants.PROFILE_KEY not in session:
-            return redirect(url_for('login_page'))
+            return redirect(url_for('authorization_page'))
         return func(*args, **kwargs)
 
     return decorated
@@ -104,77 +109,108 @@ def callback_handling():
     return redirect(url_for('dashboard'))
 
 
-@app.route(ENDPOINTS_RELATIVE_ADDRESSES['login'], methods=['GET'])
-def login_page():
-    parameters = {
-        "login_auth_endpoint": ENDPOINTS_FULL_ADDRESSES['login_auth']
-    }
-    if constants.PROFILE_KEY in session:
-        return redirect(url_for('dashboard'))
-    return render_template('login.html', parameters=parameters)
-
-
 @app.route(ENDPOINTS_RELATIVE_ADDRESSES['login_auth'], methods=['GET'])
 def login_auth():
     return auth0.authorize_redirect(redirect_uri=AUTH0_CALLBACK_URL, audience=AUTH0_AUDIENCE)
 
 
+@app.route(ENDPOINTS_RELATIVE_ADDRESSES['logout'])
+@authentication_required
+def logout():
+    session.clear()
+    params = {'returnTo': url_for('authorization_page', _external=True), 'client_id': AUTH0_CLIENT_ID}
+    return redirect(auth0.api_base_url + '/v2/logout?' + urlencode(params))
+
+
+@lru_cache(100)
+def get_user_by_session_key(session_key):
+    user_id = red.get(session_key)
+    if user_id != "":
+        return user_id
+    return ""
+
+
+''' Sites section'''
+
+
+def app_site_wrapper(template, parameters):
+    user_parameters = {
+        'logged_in': 0
+    }
+
+    parameters['current_site'] = template.split(".")[0]
+    print(parameters['current_site'])
+    if constants.PROFILE_KEY in session:
+        user_parameters['login'] = session[constants.PROFILE_KEY]['name']
+        user_parameters['logged_in'] = 1
+    return render_template(template, parameters=parameters, user_parameters=user_parameters,
+                           layout_parameters=LAYOUT_PARAMETERS)
+
+
+@app.route(ENDPOINTS_RELATIVE_ADDRESSES['authorization'], methods=['GET'])
+def authorization_page():
+    parameters = {
+        "login_auth_endpoint": ENDPOINTS_FULL_ADDRESSES['login_auth'],
+        "logout_auth_endpoint": ENDPOINTS_FULL_ADDRESSES['logout']
+    }
+    return app_site_wrapper('authorization.html', parameters=parameters)
+
+
+@app.route(ENDPOINTS_RELATIVE_ADDRESSES['upload_site'], methods=['GET', 'POST'])
+@authentication_required
+def upload_site():
+    token = encode_auth_token(app, get_user_by_session_key(session['session_key']).decode())
+    parameters = {
+        "upload_endpoint": ENDPOINTS_FULL_ADDRESSES['upload_endpoint'],
+        "logout_endpoint": ENDPOINTS_FULL_ADDRESSES['logout'],
+        "token": token
+    }
+    return app_site_wrapper('upload.html', parameters)
+
+
 @app.route(ENDPOINTS_RELATIVE_ADDRESSES['dashboard'], methods=['GET', 'POST'])
 @authentication_required
 def dashboard():
-    token = ""
+    parameters = {
+        "logout_endpoint": ENDPOINTS_FULL_ADDRESSES['logout'],
+        "files": [],
+        "download_links": [],
+        "length": 0,
+        "share_links": [],
+        "show_links": [],
+        "long_polling_js": LONG_POLLING_JS_FILE
+    }
     try:
         token = encode_auth_token(app, get_user_by_session_key(session['session_key']).decode())
         data = {'authorization': token}
-        print(FILE_ENDPOINTS_ADDRESSES['files'])
         res = requests.post(FILE_ENDPOINTS_ADDRESSES['files'], data=data, verify=SSL_CERTIFICATE_VERIFY)
         files_info = res.json()
-        files = files_info['user_files']
-        download_links = prepare_download_links(files_info['files_address'], token)
-        share_links, show_links = prepare_share_links(files_info['files_address'], files_info['share_links'])
-        length = files_info['length']
-
-        parameters = {
-            "logout_endpoint": ENDPOINTS_FULL_ADDRESSES['logout'],
-            "login": session[constants.PROFILE_KEY]['name'],
-            "files": files,
-            "download_links": download_links,
-            "length": length,
-            "token": token,
-            "share_links": share_links,
-            "show_links": show_links,
-            "disable_upload": 0
-        }
-        return render_template('dashboard.html', parameters=parameters)
+        parameters['files'] = files_info['user_files']
+        parameters['download_links'] = prepare_download_links(files_info['files_address'], token)
+        parameters['share_links'], parameters['show_links'] = prepare_share_links(files_info['files_address'],
+                                                                                  files_info['share_links'])
+        parameters['length'] = files_info['length']
     except BaseException:
         flash(
-            "Problem z połączeniem - dodawanie plików jest niemożliwe. Lista plików jest nieosiągalna. "
+            "Problem z połączeniem. Lista plików jest nieosiągalna. "
             "Spróbuj za chwilę ...")
-        parameters = {
-            "logout_endpoint": ENDPOINTS_FULL_ADDRESSES['logout'],
-            "login": session[constants.PROFILE_KEY]['name'],
-            "files": [],
-            "download_links": [],
-            "length": 0,
-            "token": token,
-            "share_links": [],
-            "show_links": [],
-            "disable_upload": 1
-        }
-        return render_template('dashboard.html', parameters=parameters)
+    return app_site_wrapper('dashboard.html', parameters)
 
 
-@app.route(ENDPOINTS_RELATIVE_ADDRESSES['upload'], methods=['POST'])
+'''Endpoints section'''
+
+
+@app.route(ENDPOINTS_RELATIVE_ADDRESSES['upload_endpoint'], methods=['POST'])
 @authentication_required
 def upload():
     if 'file' not in request.files:
         flash('Aby dodać plik, muszisz go wybrać!')
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('upload_site'))
     file = request.files['file']
 
     if file.filename == '':
         flash('Aby dodać plik, musisz go wybrać!')
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('upload_site'))
     try:
         token = request.form['authorization']
         token_str = token[2:-1]
@@ -184,7 +220,7 @@ def upload():
                                verify=SSL_CERTIFICATE_VERIFY)
         if result.status_code == 200:
             flash("Pomyślnie dodano!")
-            flash("_ok")
+            flash("_valid")
             expire_date = datetime.datetime.now()
             expire_date = expire_date + datetime.timedelta(seconds=2)
             recently_uploaded_files[session[constants.PROFILE_KEY]['name']] = UploadedFile(file.filename, expire_date,
@@ -197,28 +233,28 @@ def upload():
             flash("Wystąpił problem podczas dodawania pliku!")
     except AttributeError:
         flash("Spróbuj jeszcze raz!")
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('upload_site'))
 
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('upload_site'))
 
 
-@app.route(ENDPOINTS_RELATIVE_ADDRESSES['share'] + '/<string:hash>/<string:switch>', methods=['GET'])
+@app.route(ENDPOINTS_RELATIVE_ADDRESSES['share'] + '/<string:file_hash>/<string:switch>', methods=['GET'])
 @authentication_required
-def share(hash, switch):
+def share(file_hash, switch):
     try:
         token = encode_auth_token(app, get_user_by_session_key(session['session_key']).decode())
         data = {'authorization': token,
-                'file_hash': hash,
+                'file_hash': file_hash,
                 'switch': switch}
         result = requests.put(FILE_ENDPOINTS_ADDRESSES['share'], data=data, verify=SSL_CERTIFICATE_VERIFY)
         if result.status_code == 200:
             if result.text != "":
                 flash("Pomyślnie udostępniono plik!")
-                flash("_ok")
+                flash("_valid")
                 flash(FILE_ENDPOINTS_ADDRESSES['share'] + "/" + result.text)
             else:
                 flash("Pomyślnie anulowano udostępnianie pliku!")
-                flash("_ok")
+                flash("_valid")
         elif result.status_code == 404:
             flash("Nie znaleziono pliku")
         else:
@@ -233,17 +269,9 @@ def share(hash, switch):
 @authentication_required
 def show_link(hash):
     flash("Link do Twojego pliku:")
-    flash("_ok")
+    flash("_valid")
     flash(FILE_ENDPOINTS_ADDRESSES['share'] + "/" + hash)
     return redirect(url_for('dashboard'))
-
-
-@app.route(ENDPOINTS_RELATIVE_ADDRESSES['logout'])
-@authentication_required
-def logout():
-    session.clear()
-    params = {'returnTo': url_for('login_page', _external=True), 'client_id': AUTH0_CLIENT_ID}
-    return redirect(auth0.api_base_url + '/v2/logout?' + urlencode(params))
 
 
 # 2 methods below are used for long-polling communicates about uploading files
@@ -270,11 +298,3 @@ def polling_data():
         file.add_session_to_showed(session['session_key'])
         return Response("Dodano nowy plik. Odśwież stronę by go zobaczyć.", status=200)
     return Response(status=200)
-
-
-@lru_cache(100)
-def get_user_by_session_key(session_key):
-    user_id = red.get(session_key)
-    if user_id != "":
-        return user_id
-    return ""

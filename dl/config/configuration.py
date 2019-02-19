@@ -1,5 +1,5 @@
 APP_MAIN_ENDPOINT = '/milewsp1/file/'
-APP_ADDRESS = "https://edi.iem.pw.edu.pl/"
+APP_ADDRESS = "https://*SECRET*/"
 
 USERS_FILES_PATH = "data/users/"
 USER_FILES_LIMIT = 5

@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block title %}Upload{% endblock %}
+{% block content %}
+    <section class="page-section cta">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-9 mx-auto">
+                    <div class="bg-faded rounded p-3">
+                        {% if user_parameters['logged_in'] == 0 %}
+                            <form method="GET" action="{{ parameters['login_auth_endpoint'] }}">
+                                <div class="form-group">
+                                    <input type="submit" class="btn btn-primary form_button" name="send"
+                                           value="Zaloguj z wykorzystaniem auth0">
+                                </div>
+                            </form>
+                        {% else %}
+                            <form method="GET" action="{{ parameters['logout_auth_endpoint'] }}">
+                                <div class="form-group">
+                                    <input type="submit" class="btn btn-primary form_button_big" name="send"
+                                           value="Wyloguj z wykorzystaniem auth0">
+                                </div>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
