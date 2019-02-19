@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <title>Zajęcia 1</title>
+    <meta charset="UTF-8"/>
+    <link rel="Stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+<header><h1>Formularz logowania</h1></header>
+<article class="main_elem">
+    <form id="loginForm" action="{{ basics['login_endpoint'] }}" method="POST">
+        <div class="form_elem" id="login">
+            <div class="left">Login:</div>
+            <div class="right"><input type="text" name="login" class="data_field"></div>
+            <div class="clear"></div>
+        </div>
+        <div class="form_elem" id="password">
+            <div class="left">Hasło:</div>
+            <div class="right"><input type="password" name="password" class="data_field"></div>
+            <div class="clear"></div>
+        </div>
+        <div class="clear"></div>
+        <div class="form_elem_button">
+            <input type="submit" name="send" value="Zaloguj" id="login_button">
+            {% if basics['not_found'] %}
+                <div id="login_validation" class="validation_server">Błędne dane logowania</div>
+            {% endif %}
+        </div>
+
+    </form>
+</article>
+<footer class="footer">
+    <div>Dane logowania zawarte w PLIKU README na ISODzie :-)</div>
+    <div>Patryk Milewski &#xA9; 2018</div>
+</footer>
+</body>
+<script type="text/javascript" src="{{ url_for('static', filename='js/validator.js') }}"></script>
+</html>

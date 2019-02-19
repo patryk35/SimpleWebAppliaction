@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <title>{{ login }} Dashboard</title>
+    <meta charset="UTF-8"/>
+    <link rel="Stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="Stylesheet" type="text/css" href="{{ url_for('static', filename='css/menu.css') }}">
+</head>
+<body>
+<aside>
+    <div class="logout">
+        <ul id="menu">
+            <li class="menu_li_user">{{ basics['login'] }}</li>
+            <li class="menu_li"><a href={{ basics['logout_endpoint'] }}>Wyloguj</a></li>
+        </ul>
+    </div>
+</aside>
+<article class="main_elem">
+    <h2>Twoje pliki:</h2>
+    <div class="form_elem" id="{{ file_name }}">
+        {% if length == 0 %}
+            <div>Tu pojawią się Twoje pliki</div>
+        {% else %}
+            {% for i in range(length) %}
+                <div class="left">{{ files[i] }}</div>
+                <div class="right"><a href="{{ links[i] }}">Download</a></div>
+                <div class="clear"></div>
+            {% endfor %}
+        {% endif %}
+
+    </div>
+</article>
+<article class="main_elem">
+    <h2>Dodaj plik:</h2>
+    <form id="uploadForm" action="{{ basics['upload_endpoint'] }}" method="POST" enctype="multipart/form-data">
+        <div class="form_elem" id="login">
+            <input type="file" name="file">
+            <input type="hidden" name="authorization" value="{{ token }}">
+        </div>
+        <div class="form_elem_button">
+            <input type="submit" name="send" value="Wyślij" id="login_button">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div id="login_validation" class="validation_server{{ messages[1] }}">{{ messages[0] }}</div>
+                {% endif %}
+            {% endwith %}
+        </div>
+    </form>
+</article>
+<footer class="footer">
+    Patryk Milewski &#xA9; 2018
+</footer>
+</body>
+<script type="text/javascript" src="{{ url_for('static', filename='js/validator_upload.js') }}"></script>
+</html>
