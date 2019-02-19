@@ -175,6 +175,7 @@ def dashboard():
         "logout_endpoint": ENDPOINTS_FULL_ADDRESSES['logout'],
         "files": [],
         "download_links": [],
+        "miniature_links": [],
         "length": 0,
         "share_links": [],
         "show_links": [],
@@ -186,7 +187,7 @@ def dashboard():
         res = requests.post(FILE_ENDPOINTS_ADDRESSES['files'], data=data, verify=SSL_CERTIFICATE_VERIFY)
         files_info = res.json()
         parameters['files'] = files_info['user_files']
-        parameters['download_links'] = prepare_download_links(files_info['files_address'], token)
+        parameters['download_links'], parameters['thumbnail_links'] = prepare_download_links(files_info['files_address'], files_info['has_thumbnail'], token)
         parameters['share_links'], parameters['show_links'] = prepare_share_links(files_info['files_address'],
                                                                                   files_info['share_links'])
         parameters['length'] = files_info['length']

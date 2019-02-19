@@ -133,3 +133,8 @@ input.link_container {
     margin-top: 10rem;
     width: 100%;
 }
+
+.image_preview {
+    zindex: 100;
+    position: absolute;
+}

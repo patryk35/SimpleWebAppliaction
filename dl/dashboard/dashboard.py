@@ -8,6 +8,8 @@ import time
 from werkzeug.utils import secure_filename
 from hashlib import sha1
 
+from dashboard.MQ import create_thumbnail
+
 UPLOAD_STATUSES = {
     "OK": 100,
     "LIMIT_EXCEEDED": 200,
@@ -43,8 +45,11 @@ def upload_file(user_id, file, filename):
         filename = secure_filename(filename)
         timestamp = str(datetime.datetime.now().strftime('%Y%m%d%H%M%S'))
         file_hash = hash_name(filename + str(user_id) + str(timestamp))
-        file.save(os.path.join(origin_path, file_hash))
-        update_json_file(origin_path, filename, file_hash, timestamp)
+        file_path = os.path.join(origin_path, file_hash)
+        file.save(file_path)
+        extension = filename.rsplit('.', 1)[1].lower()
+        thumbnail_name = create_thumbnail(file_path, extension)
+        update_json_file(origin_path, filename, file_hash, timestamp, thumbnail_name)
         return UPLOAD_STATUSES['OK']
     else:
         return UPLOAD_STATUSES['WRONG_FILE_EXTENSION']
@@ -65,13 +70,14 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-def update_json_file(directory, filename, file_hash, timestamp):
+def update_json_file(directory, filename, file_hash, timestamp, thumbnail_name):
     file_object = {
         "origin_name": filename,
         "hash": file_hash,
         "timestamp": timestamp,
         "is_shared": False,
-        "share_stamp": ""
+        "share_stamp": "",
+        "thumbnail_name": thumbnail_name
     }
     path = os.path.join(directory, "files.json")
     with open(path, "r") as file:
@@ -100,7 +106,7 @@ def get_file(user_id, file_hash):
     return path, name
 
 
-def get_file(user_id, file_hash):
+def get_thumbnail(user_id, file_hash):
     directory = hash_name(str(user_id))
     path = USERS_FILES_PATH + directory  # + "/" + file_hash
     json_path = USERS_FILES_PATH + directory + "/files.json"
@@ -110,16 +116,18 @@ def get_file(user_id, file_hash):
         file.close()
         for f in files['content']:
             if f['hash'] == file_hash:
-                name = f['origin_name']
+                name = f['thumbnail_name']
                 break
-    path += "/" + file_hash
+    path += "/" + name
     return path, name
 
 
 def get_user_files(user_id):
-    user_files = [''] * 5
-    files_address = [''] * 5
-    share_links = [''] * 5
+    user_files = [''] * USER_FILES_LIMIT
+    files_address = [''] * USER_FILES_LIMIT
+    share_links = [''] * USER_FILES_LIMIT
+    has_thumbnail = [0] * USER_FILES_LIMIT
+
     length = 0
     directory = hash_name(str(user_id))
     json_path = USERS_FILES_PATH + directory + "/files.json"
@@ -136,11 +144,14 @@ def get_user_files(user_id):
                 files_address[length] = f['hash']
                 if f['share_stamp'] != '':
                     share_links[length] = directory + f['hash'] + f['share_stamp']
+                if f['thumbnail_name'] != "":
+                    has_thumbnail[length] = 1
                 length += 1
     res = {}
     res['user_files'] = user_files
     res['files_address'] = files_address
     res['share_links'] = share_links
+    res['has_thumbnail'] = has_thumbnail
     res['length'] = length
     return json.dumps(res)
 
@@ -196,4 +207,6 @@ def get_shared_file(hash):
                 return path, ERRORS['ACCESS_DENIED']
     path += "/" + file_hash
     return path, name
+
+
 
