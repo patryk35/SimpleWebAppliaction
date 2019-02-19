@@ -11,8 +11,8 @@
 <aside>
     <div class="logout">
         <ul id="menu">
-            <li class="menu_li_user">{{ basics['login'] }}</li>
-            <li class="menu_li"><a href={{ basics['logout_endpoint'] }}>Wyloguj</a></li>
+            <li class="menu_li_user">{{ parameters['login'] }}</li>
+            <li class="menu_li"><a href={{ parameters['logout_endpoint'] }}>Wyloguj</a></li>
         </ul>
     </div>
 </aside>
@@ -35,17 +35,19 @@
         </article>
     {% endif %}
 {% endwith %}
-{% if length != 0 %}
+{% if parameters['length'] != 0 %}
     <article class="file_list_container">
         <h2>Twoje pliki:</h2>
-        <div class="form_elem" id="{{ file_name }}">
-            {% for i in range(length) %}
-                <div class="left">{{ files[i] }}</div>
-                {% if show_links[i] != '' %}
-                    <div class="right"><a href="{{ download_links[i] }}">Download</a> <a href="{{ share_links[i] }}">Unshare</a>
-                        <a href="{{ show_links[i] }}">Show link</a></div>
+        <div class="form_elem" id="{{ parameters['file_name'] }}">
+            {% for i in range(parameters['length']) %}
+                <div class="left">{{ parameters['files'][i] }}</div>
+                {% if parameters['show_links'][i] != '' %}
+                    <div class="right"><a href="{{ parameters['download_links'][i] }}">Download</a> <a
+                            href="{{ parameters['share_links'][i] }}">Unshare</a>
+                        <a href="{{ parameters['show_links'][i] }}">Show link</a></div>
                 {% else %}
-                    <div class="right"><a href="{{ download_links[i] }}">Download</a> <a href="{{ share_links[i] }}">Share</a>
+                    <div class="right"><a href="{{ parameters['download_links'][i] }}">Download</a> <a
+                            href="{{ parameters['share_links'][i] }}">Share</a>
                     </div>
                 {% endif %}
                 <div class="clear"></div>
@@ -53,19 +55,22 @@
         </div>
     </article>
 {% endif %}
-<article class="main_elem">
-    <h2>Dodaj plik:</h2>
-    <form id="uploadForm" method="POST" action="https://edi.iem.pw.edu.pl/milewsp1/app/upload"
-          enctype="multipart/form-data">
-        <div class="form_elem" id="login">
-            <input type="file" name="file">
-            <input type="hidden" name="authorization" value="{{ token }}">
-        </div>
-        <div class="form_elem_button">
-            <input type="submit" name="send" value="Wyślij" id="login_button">
-        </div>
-    </form>
-</article>
+{% if parameters['disable_upload'] == 0 %}
+    <article class="main_elem">
+        <h2>Dodaj plik:</h2>
+        <form id="uploadForm" method="POST" action="https://edi.iem.pw.edu.pl/milewsp1/app/upload"
+              enctype="multipart/form-data">
+            <div class="form_elem" id="login">
+                <input type="file" name="file">
+                <input type="hidden" name="authorization" value="{{ parameters['token'] }}">
+            </div>
+            <div class="form_elem_button">
+                <input type="submit" name="send" value="Wyślij" id="login_button">
+            </div>
+        </form>
+    </article>
+{% endif %}
+
 <footer class="footer">
     Patryk Milewski &#xA9; 2018
 </footer>

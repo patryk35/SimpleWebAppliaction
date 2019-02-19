@@ -8,31 +8,15 @@
 <body>
 <header><h1>Formularz logowania</h1></header>
 <article class="main_elem">
-    <form id="loginForm" action="{{ basics['login_endpoint'] }}" method="POST">
-        <div class="form_elem" id="login">
-            <div class="left">Login:</div>
-            <div class="right"><input type="text" name="login" class="data_field"></div>
-            <div class="clear"></div>
-        </div>
-        <div class="form_elem" id="password">
-            <div class="left">Hasło:</div>
-            <div class="right"><input type="password" name="password" class="data_field"></div>
-            <div class="clear"></div>
-        </div>
-        <div class="clear"></div>
+    <form id="loginForm" action="{{ parameters['login_auth_endpoint'] }}" method="GET">
         <div class="form_elem_button">
-            <input type="submit" name="send" value="Zaloguj" id="login_button">
-            {% if basics['not_found'] %}
-                <div id="login_validation" class="validation_server">Błędne dane logowania</div>
-            {% endif %}
+            <input type="submit" name="send" value="Zaloguj z wykorzystaniem auth0" id="login_button">
         </div>
 
     </form>
 </article>
 <footer class="footer">
-    <div>Dane logowania zawarte w PLIKU README na ISODzie :-)</div>
     <div>Patryk Milewski &#xA9; 2018</div>
 </footer>
 </body>
-<script type="text/javascript" src="https://edi.iem.pw.edu.pl/~milewsp1/static/js/validator.js"></script>
 </html>

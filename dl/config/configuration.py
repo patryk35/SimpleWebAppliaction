@@ -1,15 +1,12 @@
-from hashlib import sha3_512
-
-def hash_string(string):
-    return sha3_512(string.encode()).hexdigest()
+APP_MAIN_ENDPOINT = '/milewsp1/file/'
+APP_ADDRESS = "https://edi.iem.pw.edu.pl/"
 
 USERS_FILES_PATH = "data/users/"
 USER_FILES_LIMIT = 5
 # To disallow XSS attacks - allowed extensions limitation
 ALLOWED_EXTENSIONS_ENABLED = True
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
-APP_MAIN_ENDPOINT = '/milewsp1/file/'
-APP_ADDRESS = "" #ADRESS_STRING
+
 ENDPOINTS_RELATIVE_ADDRESSES = {
     "upload": APP_MAIN_ENDPOINT + "upload",
     "download": APP_MAIN_ENDPOINT + "download",
@@ -23,5 +20,3 @@ ENDPOINTS_FULL_ADDRESSES = {
     "files": ENDPOINTS_RELATIVE_ADDRESSES["files"],
     "share": ENDPOINTS_RELATIVE_ADDRESSES["share"]
 }
-
-JWT_KEY = "USED_SECRET"
