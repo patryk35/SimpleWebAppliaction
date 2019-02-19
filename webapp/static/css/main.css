@@ -1,6 +1,6 @@
 body {
     /* Background pattern from subtlepatterns.com */
-    background: url("/static/img/main.png") repeat;
+    background: url("/~milewsp1/static/img/main.png") repeat;
     font-family: Arial;
     color: white;
     margin: 0;
@@ -18,7 +18,7 @@ body {
     padding: 10px 10px 20px 10px;
     background-color: #333;
 }
-.main_elem {
+.file_list_container {
     margin-left: auto;
     margin-right: auto;
     margin-top: 60px;
@@ -29,7 +29,20 @@ body {
     border-radius: 5px;
     padding: 10px 10px 20px 10px;
     background-color: #333;
-    height: 200px;
+    height: 170px;
+}
+.communication_container {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 60px;
+    text-align: center;
+    width: 580px;
+    border: gold 2px;
+    border-style: solid;
+    border-radius: 5px;
+    padding: 10px 10px 20px 10px;
+    background-color: #333;
+    height: 50px;
 }
 h1 {
     color: white;
@@ -130,3 +143,6 @@ a:visited {
     height: 80%;
 }
 
+#share_link {
+    width: 90%;
+}

@@ -2,13 +2,13 @@
   "users": [
     {
       "id": 1,
-      "login":"patryk",
-      "password":"f69b4332915d3da82fd0b36e03f9bb301fff822b2cc2aa3a84c155443bf47ee35da638eac33c747bc9cd8b36412f4ae88f5e11e6985d846671fcfcea4b8f3e9c"
+      "login": "patryk",
+      "password": "f69b4332915d3da82fd0b36e03f9bb301fff822b2cc2aa3a84c155443bf47ee35da638eac33c747bc9cd8b36412f4ae88f5e11e6985d846671fcfcea4b8f3e9c"
     },
     {
       "id": 2,
-      "login":"testUser",
-      "password":"e0040c02f4e9ef05d98365bbc85a2a12201e93d69c5dcaa75fec06f0607552fb3385f867e106ce1fb3c2089ae757b803c515f9b2f61b17d9dc4930f7ef8d1b1b"
+      "login": "testUser",
+      "password": "e0040c02f4e9ef05d98365bbc85a2a12201e93d69c5dcaa75fec06f0607552fb3385f867e106ce1fb3c2089ae757b803c515f9b2f61b17d9dc4930f7ef8d1b1b"
     }
   ]
 }

@@ -3,8 +3,9 @@
 <head>
     <title>{{ login }} Dashboard</title>
     <meta charset="UTF-8"/>
-    <link rel="Stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="Stylesheet" type="text/css" href="{{ url_for('static', filename='css/menu.css') }}">
+    <meta http-equiv="refresh" content="230"/>
+    <link rel="Stylesheet" type="text/css" href="https://edi.iem.pw.edu.pl/~milewsp1/static/css/main.css">
+    <link rel="Stylesheet" type="text/css" href="https://edi.iem.pw.edu.pl/~milewsp1/static/css/menu.css">
 </head>
 <body>
 <aside>
@@ -15,41 +16,59 @@
         </ul>
     </div>
 </aside>
-<article class="main_elem">
-    <h2>Twoje pliki:</h2>
-    <div class="form_elem" id="{{ file_name }}">
-        {% if length == 0 %}
-            <div>Tu pojawią się Twoje pliki</div>
-        {% else %}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <article class="communication_container">
+            <div class="form_elem" id="communicate">
+                {% if not messages[1] %}
+                    <div id="login_validation" class="validation_server">Ups... Coś poszło nie tak</div>
+                {% elif not messages[2] %}
+                    <div id="login_validation" class="validation_server{{ messages[1] }}"></div>
+                {% endif %}
+                <div id="login_validation" class="validation_server{{ messages[1] }}">{{ messages[0] }}</div>
+                {% if messages[2] %}
+                    <form>
+                        <input type="text" value="{{ messages[2] }}" id="share_link" readonly>
+                    </form>
+                {% endif %}
+            </div>
+        </article>
+    {% endif %}
+{% endwith %}
+{% if length != 0 %}
+    <article class="file_list_container">
+        <h2>Twoje pliki:</h2>
+        <div class="form_elem" id="{{ file_name }}">
             {% for i in range(length) %}
                 <div class="left">{{ files[i] }}</div>
-                <div class="right"><a href="{{ links[i] }}">Download</a></div>
+                {% if show_links[i] != '' %}
+                    <div class="right"><a href="{{ download_links[i] }}">Download</a> <a href="{{ share_links[i] }}">Unshare</a>
+                        <a href="{{ show_links[i] }}">Show link</a></div>
+                {% else %}
+                    <div class="right"><a href="{{ download_links[i] }}">Download</a> <a href="{{ share_links[i] }}">Share</a>
+                    </div>
+                {% endif %}
                 <div class="clear"></div>
             {% endfor %}
-        {% endif %}
-
-    </div>
-</article>
+        </div>
+    </article>
+{% endif %}
 <article class="main_elem">
     <h2>Dodaj plik:</h2>
-    <form id="uploadForm" action="{{ basics['upload_endpoint'] }}" method="POST" enctype="multipart/form-data">
+    <form id="uploadForm" method="POST" action="https://edi.iem.pw.edu.pl/milewsp1/app/upload"
+          enctype="multipart/form-data">
         <div class="form_elem" id="login">
             <input type="file" name="file">
             <input type="hidden" name="authorization" value="{{ token }}">
         </div>
         <div class="form_elem_button">
             <input type="submit" name="send" value="Wyślij" id="login_button">
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                    <div id="login_validation" class="validation_server{{ messages[1] }}">{{ messages[0] }}</div>
-                {% endif %}
-            {% endwith %}
         </div>
     </form>
 </article>
 <footer class="footer">
     Patryk Milewski &#xA9; 2018
 </footer>
+<script type="text/javascript" src="https://edi.iem.pw.edu.pl/~milewsp1/static/js/longpolling.js"></script>
 </body>
-<script type="text/javascript" src="{{ url_for('static', filename='js/validator_upload.js') }}"></script>
 </html>
